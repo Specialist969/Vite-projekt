@@ -129,7 +129,7 @@ function renderStories() {
         storyList.appendChild(storyElement);
     });
 }
-
+//
 // Obsługa dodawania nowej historyjki
 addStoryForm.addEventListener('submit', (event) => {
     event.preventDefault();
