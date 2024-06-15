@@ -1,0 +1,292 @@
+
+/*
+:root {
+  font-family: 'Poppins', sans-serif; 
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: #333; 
+  background-color: #f5f5f5; 
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #007BFF; 
+  text-decoration: none; 
+}
+a:hover {
+  color: #0056b3; 
+}
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #f5f5f5; 
+  color: #333; 
+}
+
+h1, h2 {
+  font-size: 2.4em;
+  line-height: 1.2; 
+  margin-bottom: 0.5em;
+}
+
+h1 {
+  font-size: 3.2em;
+}
+
+#app {
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 1em;
+  padding: 0.5em;
+  background-color: #e9ecef; 
+  border-radius: 8px;
+}
+
+form {
+  width: 100%; 
+  margin-bottom: 2em;
+  display: flex; 
+  flex-wrap: wrap; 
+  justify-content: space-around; 
+  align-items: center; 
+}
+
+form input, form select {
+  flex: 1 1 30%; 
+  padding: 0.5em;
+  font-size: 1em;
+  border-radius: 4px;
+  border: 1px solid #ccc; 
+  background-color: #fff; 
+  color: #333; 
+  margin: 0 10px; 
+}
+
+form button {
+  flex: 0 0 auto; 
+  border-radius: 8px;
+  border: none;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #007BFF; 
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.25s;
+}
+
+form button:hover {
+  background-color: #0056b3;
+}
+
+
+.kanban-column {
+  display: inline-block;
+  vertical-align: top;
+  width: 30%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background-color: #e9ecef; 
+  border-radius: 8px;
+  margin: 0 1%;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #333;
+    background-color: #ffffff;
+  }
+  body {
+    background-color: #ffffff;
+    color: #333;
+  }
+}
+
+#kanban-board {
+  display: flex;
+  justify-content: space-between;
+}
+
+body {
+  background-color: #fff;
+  color: #333;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+      background-color: #333;
+      color: #fff;
+  }
+
+}
+
+body.light-mode {
+  background-color: #fff;
+  color: #333;
+}
+
+
+body.dark-mode {
+  background-color: #333;
+  color: #fff;
+}
+*/
+
+:root {
+  --text-color-light: #333; /* Ciemniejszy kolor tekstu dla lepszej czytelności na jasnym tle */
+  --text-color-dark: #fff; /* Jasny kolor tekstu dla ciemnego tła */
+  --background-color-light: #f5f5f5; /* Jaśniejsze tło dla świeżego wyglądu */
+  --background-color-dark: #333; /* Ciemne tło dla ciemnego motywu */
+  --link-color: #007BFF; /* Jaśniejszy niebieski kolor dla linków */
+  --link-hover-color: #0056b3; /* Ciemniejszy niebieski kolor po najechaniu kursorem */
+  --input-bg-color: #fff; /* Biały kolor tła dla pól formularza */
+  --button-bg-color: #007BFF; /* Niebieski kolor tła przycisków */
+  --button-hover-bg-color: #0056b3; /* Ciemniejszy niebieski kolor tła przycisków po najechaniu */
+
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--background-color-light);
+  color: var(--text-color-light);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+      background-color: var(--background-color-dark);
+      color: var(--text-color-dark);
+  }
+}
+
+body.light-mode {
+  background-color: var(--background-color-light);
+  color: var(--text-color-light);
+}
+
+body.dark-mode {
+  background-color: var(--background-color-dark);
+  color: var(--text-color-dark);
+}
+
+a {
+  font-weight: 500;
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--link-hover-color);
+}
+
+h1, h2 {
+  font-size: 2.4em;
+  line-height: 1.2;
+  margin-bottom: 0.5em;
+}
+
+h1 {
+  font-size: 3.2em;
+}
+
+#app {
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+ul, form {
+  width: 100%;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li, form input, form select, form button {
+  margin: 0.5em 0;
+  padding: 0.5em;
+  background-color: var(--input-bg-color);
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  color: var(--text-color-light);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+button {
+  background-color: var(--button-bg-color);
+  color: var(--text-color-dark);
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 500;
+  border: none;
+  padding: 0.6em 1.2em;
+  transition: background-color 0.25s, color 0.25s;
+}
+
+button:hover {
+  background-color: var(--button-hover-bg-color);
+}
+
+.kanban-column {
+  display: inline-block;
+  vertical-align: top;
+  width: 30%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background-color: var(--background-color-light);
+  border-radius: 8px;
+  margin: 0 1%;
+}
+
+.kanban-column li {
+  background-color: #e9ecef;
+}
+
+@media (prefers-color-scheme: dark) {
+  .kanban-column {
+      background-color: var(--background-color-dark);
+  }
+
+  .kanban-column li {
+      background-color: #444;
+  }
+}

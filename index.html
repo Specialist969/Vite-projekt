@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Management App</title>
+    <link rel="stylesheet" type="text/css" href="src/style.css">
+</head>
+<body>
+    <button id="theme-toggle">Przełącz tryb</button>
+    <form id="login-form">
+        <input type="text" id="login-username" placeholder="Login" required>
+        <input type="password" id="login-password" placeholder="Hasło" required>
+        <button type="submit">Zaloguj</button>
+    </form>
+
+    <h1>Zarządzanie Projektem</h1>
+    <h2>Projekty</h2>
+    <ul id="project-list"></ul>
+    <form id="add-project-form">
+        <input type="text" id="project-name" placeholder="Nazwa projektu" required>
+        <input type="text" id="project-description" placeholder="Opis projektu" required>
+        <button type="submit">Dodaj Projekt</button>
+    </form>
+
+    <h2>Aktualny Projekt: <span id="active-project-name">Brak</span></h2>
+
+    <h2>Historyjki</h2>
+    <ul id="story-list"></ul>
+    <form id="add-story-form">
+        <input type="text" id="story-name" placeholder="Nazwa historyjki" required>
+        <input type="text" id="story-description" placeholder="Opis historyjki" required>
+        <select id="story-priority" required>
+            <option value="low">Niski</option>
+            <option value="medium">Średni</option>
+            <option value="high">Wysoki</option>
+        </select>
+        <button type="submit">Dodaj Historyjkę</button>
+    </form>
+
+    <h2>Zadania</h2>
+    <ul id="task-list"></ul>
+    <form id="add-task-form">
+        <input type="text" id="task-name" placeholder="Nazwa zadania" required>
+        <input type="text" id="task-description" placeholder="Opis zadania" required>
+        <select id="task-priority" required>
+            <option value="low">Niski</option>
+            <option value="medium">Średni</option>
+            <option value="high">Wysoki</option>
+        </select>
+        <input type="number" id="task-estimated-time" placeholder="Przewidywany czas (w godzinach)" required>
+        <select id="story-select" required>
+            <!-- Options will be dynamically populated -->
+        </select>
+        <select id="user-select" required>
+            <!-- Options will be dynamically populated -->
+        </select>
+        <button type="submit">Dodaj Zadanie</button>
+    </form>
+
+    <h2>Tablica Kanban</h2>
+    <div id="kanban-board">
+        <div id="todo-column" class="kanban-column">
+            <h3>Todo</h3>
+            <ul id="todo-tasks" class="task-list"></ul>
+        </div>
+        <div id="doing-column" class="kanban-column">
+            <h3>Doing</h3>
+            <ul id="doing-tasks" class="task-list"></ul>
+        </div>
+        <div id="done-column" class="kanban-column">
+            <h3>Done</h3>
+            <ul id="done-tasks" class="task-list"></ul>
+        </div>
+    </div>
+
+    <script type="module" src="src/main.ts"></script>
+</body>
+</html>
