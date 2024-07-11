@@ -4,16 +4,20 @@
 */
 
 :root {
-  --text-color-light: #333; /* Ciemniejszy kolor tekstu dla lepszej czytelności na jasnym tle */
-  --text-color-dark: #fff; /* Jasny kolor tekstu dla ciemnego tła */
-  --background-color-light: #f5f5f5; /* Jaśniejsze tło dla świeżego wyglądu */
-  --background-color-dark: #333; /* Ciemne tło dla ciemnego motywu */
-  --link-color: #007BFF; /* Jaśniejszy niebieski kolor dla linków */
-  --link-hover-color: #0056b3; /* Ciemniejszy niebieski kolor po najechaniu kursorem */
-  --input-bg-color: #fff; /* Biały kolor tła dla pól formularza */
-  --button-bg-color: #007BFF; /* Niebieski kolor tła przycisków */
-  --button-hover-bg-color: #0056b3; /* Ciemniejszy niebieski kolor tła przycisków po najechaniu */
-
+  --text-color-light: #333;
+  --text-color-dark: #fff;
+  --background-color-light: #f5f5f5;
+  --background-color-dark: #333;
+  --link-color: #007BFF;
+  --link-hover-color: #0056b3;
+  --input-bg-color: #fff;
+  --input-border-color: #ccc;
+  --input-focus-border-color: #007BFF;
+  --button-bg-color: #007BFF;
+  --button-hover-bg-color: #0056b3;
+  --box-shadow-light: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+  --box-shadow-dark: rgba(0, 0, 0, 0.6) 0px 4px 6px -1px, rgba(0, 0, 0, 0.4) 0px 2px 4px -1px;
+  --border-radius: 8px;
   font-family: 'Poppins', sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -38,8 +42,8 @@ body {
 
 @media (prefers-color-scheme: dark) {
   body {
-      background-color: var(--background-color-dark);
-      color: var(--text-color-dark);
+    background-color: var(--background-color-dark);
+    color: var(--text-color-dark);
   }
 }
 
@@ -57,6 +61,7 @@ a {
   font-weight: 500;
   color: var(--link-color);
   text-decoration: none;
+  transition: color 0.3s;
 }
 
 a:hover {
@@ -64,7 +69,6 @@ a:hover {
 }
 
 h1, h2 {
-  font-size: 2.4em;
   line-height: 1.2;
   margin-bottom: 0.5em;
 }
@@ -73,12 +77,25 @@ h1 {
   font-size: 3.2em;
 }
 
+h2 {
+  font-size: 2.4em;
+}
+
 #app {
   max-width: 1280px;
   width: 100%;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  box-shadow: var(--box-shadow-light);
+  border-radius: var(--border-radius);
+  transition: box-shadow 0.3s;
+}
+
+@media (prefers-color-scheme: dark) {
+  #app {
+    box-shadow: var(--box-shadow-dark);
+  }
 }
 
 ul, form {
@@ -92,10 +109,15 @@ li, form input, form select, form button {
   margin: 0.5em 0;
   padding: 0.5em;
   background-color: var(--input-bg-color);
-  border-radius: 4px;
-  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--input-border-color);
   color: var(--text-color-light);
-  transition: background-color 0.3s, color 0.3s;
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+  box-shadow: var(--box-shadow-light);
+}
+
+li:hover, form input:focus, form select:focus, form button:focus {
+  border-color: var(--input-focus-border-color);
 }
 
 button {
@@ -107,6 +129,7 @@ button {
   border: none;
   padding: 0.6em 1.2em;
   transition: background-color 0.25s, color 0.25s;
+  border-radius: var(--border-radius);
 }
 
 button:hover {
@@ -118,22 +141,39 @@ button:hover {
   vertical-align: top;
   width: 30%;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--input-border-color);
   background-color: var(--background-color-light);
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   margin: 0 1%;
+  box-shadow: var(--box-shadow-light);
+  transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 .kanban-column li {
   background-color: #e9ecef;
+  border-radius: var(--border-radius);
+  padding: 10px;
+  margin-bottom: 10px;
+  box-shadow: var(--box-shadow-light);
 }
 
 @media (prefers-color-scheme: dark) {
   .kanban-column {
-      background-color: var(--background-color-dark);
+    background-color: var(--background-color-dark);
+    box-shadow: var(--box-shadow-dark);
   }
 
   .kanban-column li {
-      background-color: #444;
+    background-color: #555;
+    box-shadow: var(--box-shadow-dark);
   }
+}
+
+body.dark-mode .kanban-column {
+  background-color: var(--background-color-dark);
+  box-shadow: var(--box-shadow-dark);
+}
+
+body.dark-mode .kanban-column li {
+  background-color: #555;
 }
