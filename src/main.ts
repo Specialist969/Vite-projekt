@@ -5,11 +5,13 @@ import { UserService } from '../src/UserService';
 import { Story, StoryService, StoryState, Priority } from '../src/StoryService';
 import { Task, TaskService, TaskState } from '../src/TaskService';
 import { TaskPriority } from './Task';
+import { NotificationService, Notification } from './NotificationService';
 
 const projectService = new ProjectService();
 const userService = new UserService();
 const storyService = new StoryService();
 const taskService = new TaskService();
+const notificationService = new NotificationService();
 
 // Mock użytkowników
 userService.mockUsers();
@@ -415,4 +417,137 @@ window.onload = () => {
 renderProjects();
 renderActiveProject();
 renderKanbanBoard();  // Dodane wywołanie funkcji renderującej tablicę Kanban
+
+//Notification
+const sendNotification = (title: string, message: string, priority: 'low' | 'medium' | 'high') => {
+    const notification: Notification = {
+        title,
+        message,
+        date: new Date().toISOString(),
+        priority,
+        read: false
+    };
+    notificationService.send(notification);
+};
+
+// Mock użytkowników
+userService.mockUsers();
+
+// Emitowanie powiadomień przy dodawaniu projektu
+addProjectForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const projectNameInput = document.getElementById('project-name') as HTMLInputElement;
+    const projectDescriptionInput = document.getElementById('project-description') as HTMLInputElement;
+    const projectName = projectNameInput.value;
+    const projectDescription = projectDescriptionInput.value;
+    const newProject = new Project(Date.now(), projectName, projectDescription);
+    projectService.createProject(newProject);
+    renderProjects();
+    projectNameInput.value = '';
+    projectDescriptionInput.value = '';
+
+    sendNotification('New Project Added', `Project "${projectName}" has been added.`, 'medium');
+});
+
+// Emitowanie powiadomień przy dodawaniu historyjki
+addStoryForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const storyNameInput = document.getElementById('story-name') as HTMLInputElement;
+    const storyDescriptionInput = document.getElementById('story-description') as HTMLInputElement;
+    const storyPrioritySelect = document.getElementById('story-priority') as HTMLSelectElement;
+    const storyName = storyNameInput.value;
+    const storyDescription = storyDescriptionInput.value;
+    const storyPriority = storyPrioritySelect.value as Priority;
+    const activeProject = projectService.getActiveProject();
+    if (!activeProject) {
+        alert('Nie wybrano aktywnego projektu');
+        return;
+    }
+    const newStory = new Story(
+        Date.now(),
+        storyName,
+        storyDescription,
+        storyPriority,
+        activeProject,
+        new Date(),
+        StoryState.Todo,
+        currentUser!
+    );
+    storyService.createStory(newStory);
+    renderStories();
+    populateStorySelect();
+    storyNameInput.value = '';
+    storyDescriptionInput.value = '';
+
+    sendNotification('New Story Added', `Story "${storyName}" has been added to project "${activeProject.nazwa}".`, 'medium');
+});
+
+// Emitowanie powiadomień przy dodawaniu zadania
+addTaskForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const taskNameInput = document.getElementById('task-name') as HTMLInputElement;
+    const taskDescriptionInput = document.getElementById('task-description') as HTMLInputElement;
+    const taskPrioritySelect = document.getElementById('task-priority') as HTMLSelectElement;
+    const taskName = taskNameInput.value;
+    const taskDescription = taskDescriptionInput.value;
+    const taskPriority = taskPrioritySelect.value as TaskPriority;
+    const storySelect = document.getElementById('story-select') as HTMLSelectElement;
+    const storyId = parseInt(storySelect.value);
+    const activeStory = storyService.getStories().find(story => story.id === storyId);
+    if (!activeStory) {
+        alert('Nie wybrano aktywnej historyjki');
+        return;
+    }
+    const taskEstimatedTimeInput = document.getElementById('task-estimated-time') as HTMLInputElement;
+    const taskEstimatedTime = parseInt(taskEstimatedTimeInput.value);
+    const assignedUser = userService.getCurrentUser();
+    if (!assignedUser) {
+        alert('Nie wybrano użytkownika');
+        return;
+    }
+    const newTask = new Task(
+        Date.now(),
+        taskName,
+        taskDescription,
+        taskPriority,
+        activeStory,
+        taskEstimatedTime,
+        TaskState.Todo,
+        new Date(),
+        undefined,
+        undefined,
+        assignedUser
+    );
+    taskService.createTask(newTask);
+    renderTasks(activeStory.id);
+    taskNameInput.value = '';
+    taskDescriptionInput.value = '';
+    taskEstimatedTimeInput.value = '';
+
+    sendNotification('New Task Added', `Task "${taskName}" has been added to story "${activeStory.nazwa}".`, 'medium');
+});
+
+const notificationCountElement = document.getElementById('notification-count') as HTMLSpanElement;
+
+notificationService.unreadCount().subscribe((unreadCount: { toString: () => string; }) => {
+    notificationCountElement.innerText = unreadCount.toString();
+});
+
+const notificationListElement = document.getElementById('notification-list') as HTMLUListElement;
+
+notificationService.list().subscribe((notifications: any[]) => {
+    notificationListElement.innerHTML = '';
+    notifications.forEach((notification, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <strong>${notification.title}</strong>: ${notification.message} (Priority: ${notification.priority}) - ${notification.date}
+            ${!notification.read ? '<button onclick="markAsRead(' + index + ')">Mark as read</button>' : ''}
+        `;
+        notificationListElement.appendChild(li);
+    });
+});
+
+(window as any).markAsRead = (index: number) => {
+    notificationService.markAsRead(index);
+};
 
