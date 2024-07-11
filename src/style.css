@@ -157,18 +157,6 @@ button:hover {
   box-shadow: var(--box-shadow-light);
 }
 
-@media (prefers-color-scheme: dark) {
-  .kanban-column {
-    background-color: var(--background-color-dark);
-    box-shadow: var(--box-shadow-dark);
-  }
-
-  .kanban-column li {
-    background-color: #555;
-    box-shadow: var(--box-shadow-dark);
-  }
-}
-
 body.dark-mode .kanban-column {
   background-color: var(--background-color-dark);
   box-shadow: var(--box-shadow-dark);
@@ -176,4 +164,62 @@ body.dark-mode .kanban-column {
 
 body.dark-mode .kanban-column li {
   background-color: #555;
+  box-shadow: var(--box-shadow-dark);
+}
+
+
+.project-list {
+  background-color: var(--background-color-light);
+  border: 1px solid var(--input-border-color);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.project-list li {
+  background-color: #e9ecef;
+  border-radius: var(--border-radius);
+  padding: 10px;
+  margin-bottom: 10px;
+  box-shadow: var(--box-shadow-light);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+body.dark-mode .project-list {
+  background-color: var(--background-color-dark);
+  box-shadow: var(--box-shadow-dark);
+}
+
+body.dark-mode .project-list li {
+  background-color: #555;
+  box-shadow: var(--box-shadow-dark);
+}
+
+.story-list {
+  background-color: var(--background-color-light);
+  border: 1px solid var(--input-border-color);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.story-list li {
+  background-color: #e9ecef;
+  border-radius: var(--border-radius);
+  padding: 10px;
+  margin-bottom: 10px;
+  box-shadow: var(--box-shadow-light);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+body.dark-mode .story-list {
+  background-color: var(--background-color-dark);
+  box-shadow: var(--box-shadow-dark);
+}
+
+body.dark-mode .story-list li {
+  background-color: #555;
+  box-shadow: var(--box-shadow-dark);
 }
