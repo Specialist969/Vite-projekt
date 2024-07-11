@@ -1,4 +1,11 @@
-//main.ts
+import firebase from 'firebase/app';
+import 'firebase/firestore';
+import firebaseConfig from './firebaseConfig';
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase;
+export { db };
 
 import { Project, ProjectService } from '../src/ProjectService';
 import { UserService } from '../src/UserService';
