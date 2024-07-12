@@ -131,8 +131,15 @@ button:hover {
   background-color: var(--button-hover-bg-color);
 }
 
+#kanban-board {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
 .kanban-column {
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
   vertical-align: top;
   width: 30%;
   padding: var(--padding);
