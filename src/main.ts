@@ -86,7 +86,6 @@ if (!currentUser) {
 
 currentUserElement.innerText = `Logged in as: ${currentUser.username}`;
 
-//
 document.getElementById('theme-toggle')!.addEventListener('click', () => {
     const body = document.body;
     const newTheme = body.classList.toggle('dark-mode') ? 'dark' : 'light';
@@ -110,7 +109,6 @@ function sendNotification(title: string, message: string, priority: 'low' | 'med
     notificationService.send(notification);
 }
 
-//
 
 function createProjectElement(project: Project): HTMLLIElement {
     const li = document.createElement('li');
@@ -125,6 +123,7 @@ function createProjectElement(project: Project): HTMLLIElement {
 
 function renderProjects() {
     projectList.innerHTML = '';
+
     const projects = projectService.getProjects();
     projects.forEach(project => {
         const projectElement = createProjectElement(project);
@@ -132,20 +131,32 @@ function renderProjects() {
     });
 }
 
+
 addProjectForm.addEventListener('submit', (event) => {
     event.preventDefault();
+
     const projectNameInput = document.getElementById('project-name') as HTMLInputElement;
     const projectDescriptionInput = document.getElementById('project-description') as HTMLInputElement;
-    const projectName = projectNameInput.value;
-    const projectDescription = projectDescriptionInput.value;
+
+    const projectName = projectNameInput.value.trim();
+    const projectDescription = projectDescriptionInput.value.trim();
+
+    if (projectName === '' || projectDescription === '') {
+        alert('Please fill out both the project name and description.');
+        return;
+    }
+
     const newProject = new Project(Date.now(), projectName, projectDescription);
     projectService.createProject(newProject);
+
     renderProjects();
+
     projectNameInput.value = '';
     projectDescriptionInput.value = '';
 
     sendNotification('New Project Added', `Project "${projectName}" has been added.`, 'medium');
 });
+
 
 (window as any).editProject = (projectId: number) => {
     const projectToUpdate = projectService.getProjects().find(project => project.id === projectId);
@@ -160,7 +171,6 @@ addProjectForm.addEventListener('submit', (event) => {
     }
 };
 
-// Funkcja obsługująca usuwanie projektu
 (window as any).deleteProject = (projectId: number) => {
     if (confirm('Czy na pewno chcesz usunąć ten projekt?')) {
         projectService.deleteProject(projectId);
@@ -169,7 +179,7 @@ addProjectForm.addEventListener('submit', (event) => {
     }
 };
 
-// Funkcja wybierająca aktywny projekt
+
 (window as any).selectProject = (projectId: number) => {
     const selectedProject = projectService.getProjects().find(project => project.id === projectId);
     if (selectedProject) {
@@ -178,7 +188,7 @@ addProjectForm.addEventListener('submit', (event) => {
     }
 };
 
-// Funkcja aktualizująca widok aktywnego projektu
+//  aktualizuja widoku aktywnego projektu
 function renderActiveProject() {
     const activeProject = projectService.getActiveProject();
     if (!activeProject) {
@@ -187,11 +197,11 @@ function renderActiveProject() {
     }
     document.getElementById('active-project-name')!.innerText = activeProject.nazwa;
     renderStories();
-    populateStorySelect(); // <-- Dodaj to wywołanie
-    populateUserSelect(); // <-- Dodaj to wywołanie
+    populateStorySelect(); 
+    populateUserSelect(); 
 }
 
-// Funkcja tworząca element historyjki
+
 function createStoryElement(story: Story): HTMLLIElement {
     const li = document.createElement('li');
     li.innerHTML = `
@@ -203,7 +213,7 @@ function createStoryElement(story: Story): HTMLLIElement {
     return li;
 }
 
-// Funkcja aktualizująca listę historyjek na stronie
+// aktualizuja listy historyjek
 function renderStories() {
     storyList.innerHTML = '';
     const activeProject = projectService.getActiveProject();
@@ -215,20 +225,27 @@ function renderStories() {
     });
 }
 
-// Obsługa dodawania nowej historyjki
+
 addStoryForm.addEventListener('submit', (event) => {
     event.preventDefault();
     const storyNameInput = document.getElementById('story-name') as HTMLInputElement;
     const storyDescriptionInput = document.getElementById('story-description') as HTMLInputElement;
     const storyPrioritySelect = document.getElementById('story-priority') as HTMLSelectElement;
-    const storyName = storyNameInput.value;
-    const storyDescription = storyDescriptionInput.value;
+    const storyName = storyNameInput.value.trim();
+    const storyDescription = storyDescriptionInput.value.trim();
     const storyPriority = storyPrioritySelect.value as Priority;
+
+    if (storyName === '' || storyDescription === '') {
+        alert('Please fill out both the story name and description.');
+        return;
+    }
+
     const activeProject = projectService.getActiveProject();
     if (!activeProject) {
         alert('Nie wybrano aktywnego projektu');
         return;
     }
+
     const newStory = new Story(
         Date.now(),
         storyName,
@@ -241,12 +258,15 @@ addStoryForm.addEventListener('submit', (event) => {
     );
     storyService.createStory(newStory);
     renderStories();
-    populateStorySelect(); // <-- Dodaj to wywołanie
+    populateStorySelect(); 
+
     storyNameInput.value = '';
     storyDescriptionInput.value = '';
+
+    sendNotification('New Story Added', `Story "${storyName}" has been added to project "${activeProject.nazwa}".`, 'medium');
 });
 
-// Funkcja obsługująca edycję historyjki
+
 (window as any).editStory = (storyId: number) => {
     const storyToUpdate = storyService.getStories().find(story => story.id === storyId);
     if (!storyToUpdate) return;
@@ -262,21 +282,21 @@ addStoryForm.addEventListener('submit', (event) => {
     }
 };
 
-// Funkcja obsługująca usuwanie historyjki
+
 (window as any).deleteStory = (storyId: number) => {
     if (confirm('Czy na pewno chcesz usunąć tę historyjkę?')) {
         storyService.deleteStory(storyId);
         renderStories();
-        populateStorySelect(); // <-- Dodaj to wywołanie
+        populateStorySelect();
     }
 };
 
-// Funkcja wyświetlająca zadania dla wybranej historyjki
+//  wyświetla zadania dla wybranej historyjki
 (window as any).viewTasks = (storyId: number) => {
     renderTasks(storyId);
 };
 
-// Funkcja aktualizująca listę zadań na stronie
+//  aktualizuja listy zadań
 function renderTasks(storyId: number) {
     taskList.innerHTML = '';
     const tasks = taskService.getTasksByStory(storyId);
@@ -286,15 +306,21 @@ function renderTasks(storyId: number) {
     });
 }
 
-// Obsługa dodawania nowego zadania
+
 addTaskForm.addEventListener('submit', (event) => {
     event.preventDefault();
     const taskNameInput = document.getElementById('task-name') as HTMLInputElement;
     const taskDescriptionInput = document.getElementById('task-description') as HTMLInputElement;
     const taskPrioritySelect = document.getElementById('task-priority') as HTMLSelectElement;
-    const taskName = taskNameInput.value;
-    const taskDescription = taskDescriptionInput.value;
+    const taskName = taskNameInput.value.trim();
+    const taskDescription = taskDescriptionInput.value.trim();
     const taskPriority = taskPrioritySelect.value as TaskPriority;
+
+    if (taskName === '' || taskDescription === '') {
+        alert('Please fill out both the task name and description.');
+        return;
+    }
+
     const storySelect = document.getElementById('story-select') as HTMLSelectElement;
     const storyId = parseInt(storySelect.value);
     const activeStory = storyService.getStories().find(story => story.id === storyId);
@@ -315,24 +341,28 @@ addTaskForm.addEventListener('submit', (event) => {
         taskDescription,
         taskPriority,
         activeStory,
-        taskEstimatedTime, // Przewidywany czas w godzinach jako liczba
+        taskEstimatedTime, // Przewidywany czas w godzinach
         TaskState.Todo,
-        new Date(), // Data dodania jako Date
-        undefined, // Data startu (opcjonalnie)
-        undefined, // Data zakończenia (opcjonalnie)
-        assignedUser // Użytkownik przypisany do zadania
+        new Date(), 
+        undefined, 
+        undefined, 
+        assignedUser 
     );
     taskService.createTask(newTask);
     renderTasks(activeStory.id);
+
+ 
     taskNameInput.value = '';
     taskDescriptionInput.value = '';
     taskEstimatedTimeInput.value = '';
+
+    sendNotification('New Task Added', `Task "${taskName}" has been added to story "${activeStory.nazwa}".`, 'medium');
 });
 
-// Funkcja wypełniająca listę rozwijaną historyjek
+// wypełnienie listy historyjek
 function populateStorySelect() {
     const storySelect = document.getElementById('story-select') as HTMLSelectElement;
-    storySelect.innerHTML = ''; // Clear existing options
+    storySelect.innerHTML = ''; 
     const activeProject = projectService.getActiveProject();
     if (!activeProject) return;
 
@@ -345,20 +375,23 @@ function populateStorySelect() {
     });
 }
 
-// Funkcja wypełniająca listę rozwijaną użytkowników
 function populateUserSelect() {
     const userSelect = document.getElementById('user-select') as HTMLSelectElement;
-    userSelect.innerHTML = ''; // Clear existing options
+    userSelect.innerHTML = ''; 
     const users = userService.getUsers();
-    users.forEach(user => {
-        const option = document.createElement('option');
-        option.value = user.id.toString();
-        option.textContent = `${user.imie} (${user.rola})`;
-        userSelect.appendChild(option);
-    });
+    const allowedRoles: UserRole[] = [UserRole.DevOps, UserRole.Developer]; 
+
+    users
+        .filter(user => allowedRoles.includes(user.rola))
+        .forEach(user => {
+            const option = document.createElement('option');
+            option.value = user.id.toString();
+            option.textContent = `${user.imie} (${user.rola})`;
+            userSelect.appendChild(option);
+        });
 }
 
-// Funkcja renderująca tablicę Kanban
+
 function renderKanbanBoard() {
     const todoTasksElement = document.getElementById('todo-tasks') as HTMLUListElement;
     const doingTasksElement = document.getElementById('doing-tasks') as HTMLUListElement;
@@ -385,23 +418,23 @@ function renderKanbanBoard() {
     });
 }
 
-// Funkcja obsługująca przenoszenie zadań między kolumnami
+
 function moveTask(taskId: number, newState: TaskState) {
     const task = taskService.getTasks().find(t => t.id === taskId);
     if (task) {
-        task.state = newState; // Zmiana stanu zadania
+        task.state = newState; 
         if (newState === TaskState.Doing) {
-            task.startAt = new Date(); // Ustawienie daty rozpoczęcia
+            task.startAt = new Date(); 
         } else if (newState === TaskState.Done) {
-            task.completedAt = new Date(); // Ustawienie daty zakończenia
+            task.completedAt = new Date(); 
         }
-        taskService.updateTask(task); // Aktualizacja zadania
-        renderKanbanBoard(); // Odświeżanie tablicy Kanban
+        taskService.updateTask(task); 
+        renderKanbanBoard();
     }
 }
 (window as any).moveTask = moveTask;
 
-// Uaktualnienie funkcji createTaskElement do włączenia przycisków przenoszenia
+
 function createTaskElement(task: Task): HTMLLIElement {
     const li = document.createElement('li');
     li.innerHTML = `
@@ -414,7 +447,7 @@ function createTaskElement(task: Task): HTMLLIElement {
     return li;
 }
 
-// Funkcja obsługująca edycję zadania
+
 (window as any).editTask = (taskId: number) => {
     const taskToUpdate = taskService.getTasks().find(task => task.id === taskId);
     if (!taskToUpdate) return;
@@ -436,7 +469,6 @@ function createTaskElement(task: Task): HTMLLIElement {
     }
 };
 
-// Funkcja obsługująca usuwanie zadania
 (window as any).deleteTask = (taskId: number) => {
     if (confirm('Czy na pewno chcesz usunąć to zadanie?')) {
         taskService.deleteTask(taskId);
@@ -457,97 +489,6 @@ window.onload = () => {
 };
 
 userService.mockUsers();
-
-addProjectForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const projectNameInput = document.getElementById('project-name') as HTMLInputElement;
-    const projectDescriptionInput = document.getElementById('project-description') as HTMLInputElement;
-    const projectName = projectNameInput.value;
-    const projectDescription = projectDescriptionInput.value;
-    const newProject = new Project(Date.now(), projectName, projectDescription);
-    projectService.createProject(newProject);
-    renderProjects();
-    projectNameInput.value = '';
-    projectDescriptionInput.value = '';
-
-    sendNotification('New Project Added', `Project "${projectName}" has been added.`, 'medium');
-});
-
-addStoryForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const storyNameInput = document.getElementById('story-name') as HTMLInputElement;
-    const storyDescriptionInput = document.getElementById('story-description') as HTMLInputElement;
-    const storyPrioritySelect = document.getElementById('story-priority') as HTMLSelectElement;
-    const storyName = storyNameInput.value;
-    const storyDescription = storyDescriptionInput.value;
-    const storyPriority = storyPrioritySelect.value as Priority;
-    const activeProject = projectService.getActiveProject();
-    if (!activeProject) {
-        alert('Nie wybrano aktywnego projektu');
-        return;
-    }
-    const newStory = new Story(
-        Date.now(),
-        storyName,
-        storyDescription,
-        storyPriority,
-        activeProject,
-        new Date(),
-        StoryState.Todo,
-        userService.getCurrentUser()!
-    );
-    storyService.createStory(newStory);
-    renderStories();
-    populateStorySelect();
-    storyNameInput.value = '';
-    storyDescriptionInput.value = '';
-
-    sendNotification('New Story Added', `Story "${storyName}" has been added to project "${activeProject.nazwa}".`, 'medium');
-});
-
-addTaskForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const taskNameInput = document.getElementById('task-name') as HTMLInputElement;
-    const taskDescriptionInput = document.getElementById('task-description') as HTMLInputElement;
-    const taskPrioritySelect = document.getElementById('task-priority') as HTMLSelectElement;
-    const taskName = taskNameInput.value;
-    const taskDescription = taskDescriptionInput.value;
-    const taskPriority = taskPrioritySelect.value as TaskPriority;
-    const storySelect = document.getElementById('story-select') as HTMLSelectElement;
-    const storyId = parseInt(storySelect.value);
-    const activeStory = storyService.getStories().find(story => story.id === storyId);
-    if (!activeStory) {
-        alert('Nie wybrano aktywnej historyjki');
-        return;
-    }
-    const taskEstimatedTimeInput = document.getElementById('task-estimated-time') as HTMLInputElement;
-    const taskEstimatedTime = parseInt(taskEstimatedTimeInput.value);
-    const assignedUser = userService.getCurrentUser();
-    if (!assignedUser) {
-        alert('Nie wybrano użytkownika');
-        return;
-    }
-    const newTask = new Task(
-        Date.now(),
-        taskName,
-        taskDescription,
-        taskPriority,
-        activeStory,
-        taskEstimatedTime,
-        TaskState.Todo,
-        new Date(),
-        undefined,
-        undefined,
-        assignedUser
-    );
-    taskService.createTask(newTask);
-    renderTasks(activeStory.id);
-    taskNameInput.value = '';
-    taskDescriptionInput.value = '';
-    taskEstimatedTimeInput.value = '';
-
-    sendNotification('New Task Added', `Task "${taskName}" has been added to story "${activeStory.nazwa}".`, 'medium');
-});
 
 const notificationCountElement = document.getElementById('notification-count') as HTMLSpanElement;
 
