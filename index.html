@@ -27,7 +27,7 @@
         <button type="submit">Register</button>
     </form>
 
-    <form id="login-form" style="display: none;">
+    <form id="login-form">
         <input type="text" id="login-username" placeholder="Login" required>
         <input type="password" id="login-password" placeholder="Password" required>
         <button type="submit">Login</button>
@@ -36,7 +36,7 @@
     <h1>Zarządzanie Projektem</h1>
     <h2>Projekty</h2>
     <ul id="project-list"></ul>
-    <form id="add-project-form">
+    <form id="add-project-form" style="display: none;">
         <input type="text" id="project-name" placeholder="Nazwa projektu" required>
         <input type="text" id="project-description" placeholder="Opis projektu" required>
         <button type="submit">Dodaj Projekt</button>
@@ -46,7 +46,7 @@
 
     <h2>Historyjki</h2>
     <ul id="story-list"></ul>
-    <form id="add-story-form">
+    <form id="add-story-form" style="display: none;">
         <input type="text" id="story-name" placeholder="Nazwa historyjki" required>
         <input type="text" id="story-description" placeholder="Opis historyjki" required>
         <select id="story-priority" required>
@@ -59,7 +59,7 @@
 
     <h2>Zadania</h2>
     <ul id="task-list"></ul>
-    <form id="add-task-form">
+    <form id="add-task-form" style="display: none;">
         <input type="text" id="task-name" placeholder="Nazwa zadania" required>
         <input type="text" id="task-description" placeholder="Opis zadania" required>
         <select id="task-priority" required>

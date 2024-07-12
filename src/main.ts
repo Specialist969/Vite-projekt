@@ -31,11 +31,17 @@ function updateUIBasedOnLoginStatus() {
         userInfoSection.style.display = 'block';
         loginForm.style.display = 'none';
         registrationForm.style.display = 'none';
+        addProjectForm.style.display = 'block';
+        addStoryForm.style.display = 'block';
+        addTaskForm.style.display = 'block';
         currentUserElement.innerText = `Logged in as: ${currentUser.username}`;
     } else {
         userInfoSection.style.display = 'none';
         loginForm.style.display = 'block';
         registrationForm.style.display = 'block';
+        addProjectForm.style.display = 'none';
+        addStoryForm.style.display = 'none';
+        addTaskForm.style.display = 'none';
     }
 }
 updateUIBasedOnLoginStatus();
@@ -55,6 +61,7 @@ registrationForm.addEventListener('submit', (event) => {
     const role = (document.getElementById('register-role') as HTMLSelectElement).value as UserRole;
 
     userService.register(username, password, firstName, lastName, role);
+    alert(`User ${username} registered successfully! Please log in.`);
     updateUIBasedOnLoginStatus();
 });
 
@@ -70,6 +77,7 @@ loginForm.addEventListener('submit', (event) => {
     }
 });
 
+
 const currentUser = userService.getCurrentUser();
 if (!currentUser) {
     alert('Brak zalogowanego użytkownika');
@@ -77,6 +85,32 @@ if (!currentUser) {
 }
 
 currentUserElement.innerText = `Logged in as: ${currentUser.username}`;
+
+//
+document.getElementById('theme-toggle')!.addEventListener('click', () => {
+    const body = document.body;
+    const newTheme = body.classList.toggle('dark-mode') ? 'dark' : 'light';
+    body.classList.toggle('light-mode', newTheme === 'light');
+    localStorage.setItem('theme', newTheme);
+});
+
+window.onload = () => {
+    const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.body.classList.add(savedTheme === 'dark' ? 'dark-mode' : 'light-mode');
+};
+
+function sendNotification(title: string, message: string, priority: 'low' | 'medium' | 'high') {
+    const notification: Notification = {
+        title,
+        message,
+        date: new Date().toISOString(),
+        priority,
+        read: false
+    };
+    notificationService.send(notification);
+}
+
+//
 
 function createProjectElement(project: Project): HTMLLIElement {
     const li = document.createElement('li');
@@ -421,17 +455,6 @@ window.onload = () => {
     const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     document.body.classList.add(savedTheme === 'dark' ? 'dark-mode' : 'light-mode');
 };
-
-function sendNotification(title: string, message: string, priority: 'low' | 'medium' | 'high') {
-    const notification: Notification = {
-        title,
-        message,
-        date: new Date().toISOString(),
-        priority,
-        read: false
-    };
-    notificationService.send(notification);
-}
 
 userService.mockUsers();
 

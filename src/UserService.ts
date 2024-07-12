@@ -24,7 +24,6 @@ export class UserService {
             new User(3, 'DM', 'qwerty', 'Dagmara', 'Fasolka', UserRole.Developer)
         ];
         localStorage.setItem(this.usersKey, JSON.stringify(users));
-        this.mockLogin(users[0]);
     }
 
     register(username: string, password: string, firstName: string, lastName: string, role: UserRole): void {
@@ -36,7 +35,6 @@ export class UserService {
         const newUser = new User(Date.now(), username, password, firstName, lastName, role);
         users.push(newUser);
         this.saveUsers(users);
-        alert(`User ${username} registered successfully!`);
     }
 
     login(username: string, password: string): boolean {
@@ -46,7 +44,6 @@ export class UserService {
             localStorage.setItem(this.currentUserKey, JSON.stringify(user));
             return true;
         } else {
-            alert('Invalid username or password');
             return false;
         }
     }
