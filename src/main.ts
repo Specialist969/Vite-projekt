@@ -77,7 +77,6 @@ loginForm.addEventListener('submit', (event) => {
     }
 });
 
-
 const currentUser = userService.getCurrentUser();
 if (!currentUser) {
     alert('Brak zalogowanego użytkownika');
@@ -88,8 +87,10 @@ currentUserElement.innerText = `Logged in as: ${currentUser.username}`;
 
 document.getElementById('theme-toggle')!.addEventListener('click', () => {
     const body = document.body;
-    const newTheme = body.classList.toggle('dark-mode') ? 'dark' : 'light';
-    body.classList.toggle('light-mode', newTheme === 'light');
+    const currentTheme = body.classList.contains('dark-mode') ? 'dark' : 'light';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    body.classList.remove(currentTheme === 'dark' ? 'dark-mode' : 'light-mode');
+    body.classList.add(newTheme === 'dark' ? 'dark-mode' : 'light-mode');
     localStorage.setItem('theme', newTheme);
 });
 
@@ -108,7 +109,6 @@ function sendNotification(title: string, message: string, priority: 'low' | 'med
     };
     notificationService.send(notification);
 }
-
 
 function createProjectElement(project: Project): HTMLLIElement {
     const li = document.createElement('li');
@@ -130,7 +130,6 @@ function renderProjects() {
         projectList.appendChild(projectElement);
     });
 }
-
 
 addProjectForm.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -157,7 +156,6 @@ addProjectForm.addEventListener('submit', (event) => {
     sendNotification('New Project Added', `Project "${projectName}" has been added.`, 'medium');
 });
 
-
 (window as any).editProject = (projectId: number) => {
     const projectToUpdate = projectService.getProjects().find(project => project.id === projectId);
     if (!projectToUpdate) return;
@@ -179,7 +177,6 @@ addProjectForm.addEventListener('submit', (event) => {
     }
 };
 
-
 (window as any).selectProject = (projectId: number) => {
     const selectedProject = projectService.getProjects().find(project => project.id === projectId);
     if (selectedProject) {
@@ -188,19 +185,21 @@ addProjectForm.addEventListener('submit', (event) => {
     }
 };
 
-//  aktualizuja widoku aktywnego projektu
 function renderActiveProject() {
     const activeProject = projectService.getActiveProject();
     if (!activeProject) {
         alert('Nie wybrano aktywnego projektu');
+        document.getElementById('active-project-name')!.innerText = 'Brak';
+        storyList.innerHTML = ''; 
+        taskList.innerHTML = ''; 
         return;
     }
     document.getElementById('active-project-name')!.innerText = activeProject.nazwa;
     renderStories();
-    populateStorySelect(); 
-    populateUserSelect(); 
+    populateStorySelect();
+    populateUserSelect();
+    taskList.innerHTML = '';
 }
-
 
 function createStoryElement(story: Story): HTMLLIElement {
     const li = document.createElement('li');
@@ -213,9 +212,9 @@ function createStoryElement(story: Story): HTMLLIElement {
     return li;
 }
 
-// aktualizuja listy historyjek
 function renderStories() {
     storyList.innerHTML = '';
+    taskList.innerHTML = ''; // Clear task list when rendering new stories
     const activeProject = projectService.getActiveProject();
     if (!activeProject) return;
     const stories = storyService.getStoriesByProject(activeProject.id);
@@ -224,7 +223,6 @@ function renderStories() {
         storyList.appendChild(storyElement);
     });
 }
-
 
 addStoryForm.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -266,7 +264,6 @@ addStoryForm.addEventListener('submit', (event) => {
     sendNotification('New Story Added', `Story "${storyName}" has been added to project "${activeProject.nazwa}".`, 'medium');
 });
 
-
 (window as any).editStory = (storyId: number) => {
     const storyToUpdate = storyService.getStories().find(story => story.id === storyId);
     if (!storyToUpdate) return;
@@ -282,7 +279,6 @@ addStoryForm.addEventListener('submit', (event) => {
     }
 };
 
-
 (window as any).deleteStory = (storyId: number) => {
     if (confirm('Czy na pewno chcesz usunąć tę historyjkę?')) {
         storyService.deleteStory(storyId);
@@ -291,12 +287,17 @@ addStoryForm.addEventListener('submit', (event) => {
     }
 };
 
-//  wyświetla zadania dla wybranej historyjki
 (window as any).viewTasks = (storyId: number) => {
-    renderTasks(storyId);
+    const activeProject = projectService.getActiveProject();
+    if (!activeProject) return;
+    const story = storyService.getStoriesByProject(activeProject.id).find(story => story.id === storyId);
+    if (story) {
+        renderTasks(storyId);
+    } else {
+        taskList.innerHTML = '';
+    }
 };
 
-//  aktualizuja listy zadań
 function renderTasks(storyId: number) {
     taskList.innerHTML = '';
     const tasks = taskService.getTasksByStory(storyId);
@@ -305,7 +306,6 @@ function renderTasks(storyId: number) {
         taskList.appendChild(taskElement);
     });
 }
-
 
 addTaskForm.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -351,7 +351,6 @@ addTaskForm.addEventListener('submit', (event) => {
     taskService.createTask(newTask);
     renderTasks(activeStory.id);
 
- 
     taskNameInput.value = '';
     taskDescriptionInput.value = '';
     taskEstimatedTimeInput.value = '';
@@ -359,7 +358,6 @@ addTaskForm.addEventListener('submit', (event) => {
     sendNotification('New Task Added', `Task "${taskName}" has been added to story "${activeStory.nazwa}".`, 'medium');
 });
 
-// wypełnienie listy historyjek
 function populateStorySelect() {
     const storySelect = document.getElementById('story-select') as HTMLSelectElement;
     storySelect.innerHTML = ''; 
@@ -391,7 +389,6 @@ function populateUserSelect() {
         });
 }
 
-
 function renderKanbanBoard() {
     const todoTasksElement = document.getElementById('todo-tasks') as HTMLUListElement;
     const doingTasksElement = document.getElementById('doing-tasks') as HTMLUListElement;
@@ -418,7 +415,6 @@ function renderKanbanBoard() {
     });
 }
 
-
 function moveTask(taskId: number, newState: TaskState) {
     const task = taskService.getTasks().find(t => t.id === taskId);
     if (task) {
@@ -434,7 +430,6 @@ function moveTask(taskId: number, newState: TaskState) {
 }
 (window as any).moveTask = moveTask;
 
-
 function createTaskElement(task: Task): HTMLLIElement {
     const li = document.createElement('li');
     li.innerHTML = `
@@ -446,7 +441,6 @@ function createTaskElement(task: Task): HTMLLIElement {
     `;
     return li;
 }
-
 
 (window as any).editTask = (taskId: number) => {
     const taskToUpdate = taskService.getTasks().find(task => task.id === taskId);
@@ -475,20 +469,6 @@ function createTaskElement(task: Task): HTMLLIElement {
         renderKanbanBoard();
     }
 };
-
-document.getElementById('theme-toggle')!.addEventListener('click', () => {
-    const body = document.body;
-    const newTheme = body.classList.toggle('dark-mode') ? 'dark' : 'light';
-    body.classList.toggle('light-mode', newTheme === 'light');
-    localStorage.setItem('theme', newTheme);
-});
-
-window.onload = () => {
-    const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    document.body.classList.add(savedTheme === 'dark' ? 'dark-mode' : 'light-mode');
-};
-
-userService.mockUsers();
 
 const notificationCountElement = document.getElementById('notification-count') as HTMLSpanElement;
 
