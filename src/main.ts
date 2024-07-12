@@ -1,18 +1,9 @@
-//import firebase from 'firebase/app';
-//import 'firebase/firestore';
-//import firebaseConfig from './firebaseConfig';
-
-//firebase.initializeApp(firebaseConfig);
-
-//const db = firebase;
-//export { db };
-
-import { Project, ProjectService } from '../src/ProjectService';
-import { UserService } from '../src/UserService';
-import { Story, StoryService, StoryState, Priority } from '../src/StoryService';
-import { Task, TaskService, TaskState } from '../src/TaskService';
-import { TaskPriority } from './Task';
+import { Project, ProjectService } from './ProjectService';
+import { UserService, UserRole } from './UserService';
+import { Story, StoryService, StoryState, Priority } from './StoryService';
+import { Task, TaskService, TaskState } from './TaskService';
 import { NotificationService, Notification } from './NotificationService';
+import { TaskPriority } from './Task';
 
 const projectService = new ProjectService();
 const userService = new UserService();
@@ -20,15 +11,13 @@ const storyService = new StoryService();
 const taskService = new TaskService();
 const notificationService = new NotificationService();
 
-// Mock użytkowników
 userService.mockUsers();
 
-const currentUser = userService.getCurrentUser();
-if (!currentUser) {
-    alert('Brak zalogowanego użytkownika');
-    throw new Error('Brak zalogowanego użytkownika');
-}
-
+const currentUserElement = document.getElementById('current-user') as HTMLSpanElement;
+const logoutButton = document.getElementById('logout-button') as HTMLButtonElement;
+const userInfoSection = document.getElementById('user-info') as HTMLDivElement;
+const registrationForm = document.getElementById('registration-form') as HTMLFormElement;
+const loginForm = document.getElementById('login-form') as HTMLFormElement;
 const projectList = document.getElementById('project-list') as HTMLUListElement;
 const addProjectForm = document.getElementById('add-project-form') as HTMLFormElement;
 const storyList = document.getElementById('story-list') as HTMLUListElement;
@@ -36,7 +25,59 @@ const addStoryForm = document.getElementById('add-story-form') as HTMLFormElemen
 const taskList = document.getElementById('task-list') as HTMLUListElement;
 const addTaskForm = document.getElementById('add-task-form') as HTMLFormElement;
 
-// Funkcja tworząca element projektu
+function updateUIBasedOnLoginStatus() {
+    const currentUser = userService.getCurrentUser();
+    if (currentUser) {
+        userInfoSection.style.display = 'block';
+        loginForm.style.display = 'none';
+        registrationForm.style.display = 'none';
+        currentUserElement.innerText = `Logged in as: ${currentUser.username}`;
+    } else {
+        userInfoSection.style.display = 'none';
+        loginForm.style.display = 'block';
+        registrationForm.style.display = 'block';
+    }
+}
+updateUIBasedOnLoginStatus();
+
+logoutButton.addEventListener('click', () => {
+    userService.logout();
+    updateUIBasedOnLoginStatus();
+    window.location.reload();
+});
+
+registrationForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const username = (document.getElementById('register-username') as HTMLInputElement).value;
+    const password = (document.getElementById('register-password') as HTMLInputElement).value;
+    const firstName = (document.getElementById('register-first-name') as HTMLInputElement).value;
+    const lastName = (document.getElementById('register-last-name') as HTMLInputElement).value;
+    const role = (document.getElementById('register-role') as HTMLSelectElement).value as UserRole;
+
+    userService.register(username, password, firstName, lastName, role);
+    updateUIBasedOnLoginStatus();
+});
+
+loginForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const username = (document.getElementById('login-username') as HTMLInputElement).value;
+    const password = (document.getElementById('login-password') as HTMLInputElement).value;
+    if (userService.login(username, password)) {
+        updateUIBasedOnLoginStatus();
+        window.location.reload();
+    } else {
+        alert('Invalid login credentials');
+    }
+});
+
+const currentUser = userService.getCurrentUser();
+if (!currentUser) {
+    alert('Brak zalogowanego użytkownika');
+    throw new Error('Brak zalogowanego użytkownika');
+}
+
+currentUserElement.innerText = `Logged in as: ${currentUser.username}`;
+
 function createProjectElement(project: Project): HTMLLIElement {
     const li = document.createElement('li');
     li.innerHTML = `
@@ -48,7 +89,6 @@ function createProjectElement(project: Project): HTMLLIElement {
     return li;
 }
 
-// Funkcja aktualizująca listę projektów na stronie
 function renderProjects() {
     projectList.innerHTML = '';
     const projects = projectService.getProjects();
@@ -58,7 +98,6 @@ function renderProjects() {
     });
 }
 
-// Obsługa dodawania nowego projektu
 addProjectForm.addEventListener('submit', (event) => {
     event.preventDefault();
     const projectNameInput = document.getElementById('project-name') as HTMLInputElement;
@@ -70,9 +109,10 @@ addProjectForm.addEventListener('submit', (event) => {
     renderProjects();
     projectNameInput.value = '';
     projectDescriptionInput.value = '';
+
+    sendNotification('New Project Added', `Project "${projectName}" has been added.`, 'medium');
 });
 
-// Funkcja obsługująca edycję projektu
 (window as any).editProject = (projectId: number) => {
     const projectToUpdate = projectService.getProjects().find(project => project.id === projectId);
     if (!projectToUpdate) return;
@@ -140,7 +180,7 @@ function renderStories() {
         storyList.appendChild(storyElement);
     });
 }
-////
+
 // Obsługa dodawania nowej historyjki
 addStoryForm.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -163,7 +203,7 @@ addStoryForm.addEventListener('submit', (event) => {
         activeProject,
         new Date(),
         StoryState.Todo,
-        currentUser!
+        userService.getCurrentUser()!
     );
     storyService.createStory(newStory);
     renderStories();
@@ -202,17 +242,6 @@ addStoryForm.addEventListener('submit', (event) => {
     renderTasks(storyId);
 };
 
-// Funkcja tworząca element zadania
-/*function createTaskElement(task: Task): HTMLLIElement {
-    const li = document.createElement('li');
-    li.innerHTML = `
-        <strong>${task.nazwa}</strong>: ${task.opis} (Priorytet: ${task.priorytet})
-        <button onclick="editTask(${task.id})">Edytuj</button>
-        <button onclick="deleteTask(${task.id})">Usuń</button>
-    `;
-    return li;
-}
-*/
 // Funkcja aktualizująca listę zadań na stronie
 function renderTasks(storyId: number) {
     taskList.innerHTML = '';
@@ -322,8 +351,6 @@ function renderKanbanBoard() {
     });
 }
 
-
-
 // Funkcja obsługująca przenoszenie zadań między kolumnami
 function moveTask(taskId: number, newState: TaskState) {
     const task = taskService.getTasks().find(t => t.id === taskId);
@@ -352,25 +379,7 @@ function createTaskElement(task: Task): HTMLLIElement {
     `;
     return li;
 }
-// Funkcja obsługująca przenoszenie zadań między kolumnami
-/*function moveTask(taskId: number, newState: TaskState) {
-    taskService.changeTaskState(taskId, newState);
-    renderKanbanBoard();
-}
 
-// Dodanie obsługi przenoszenia zadań przez użytkownika (dla przykładu, można to zaimplementować jako przyciski w każdym zadaniu)
-function createTaskElement(task: Task): HTMLLIElement {
-    const li = document.createElement('li');
-    li.innerHTML = `
-        <strong>${task.nazwa}</strong>: ${task.opis} (Priorytet: ${task.priorytet})
-        <button onclick="moveTask(${task.id}, 'Todo')">Todo</button>
-        <button onclick="moveTask(${task.id}, 'Doing')">Doing</button>
-        <button onclick="moveTask(${task.id}, 'Done')">Done</button>
-        <button onclick="editTask(${task.id})">Edytuj</button>
-        <button onclick="deleteTask(${task.id})">Usuń</button>
-    `;
-    return li;
-}*/
 // Funkcja obsługująca edycję zadania
 (window as any).editTask = (taskId: number) => {
     const taskToUpdate = taskService.getTasks().find(task => task.id === taskId);
@@ -401,13 +410,6 @@ function createTaskElement(task: Task): HTMLLIElement {
     }
 };
 
-document.getElementById('login-form')!.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const username = (document.getElementById('login-username') as HTMLInputElement).value;
-    const password = (document.getElementById('login-password') as HTMLInputElement).value;
-    userService.login(username, password);
-});
-
 document.getElementById('theme-toggle')!.addEventListener('click', () => {
     const body = document.body;
     const newTheme = body.classList.toggle('dark-mode') ? 'dark' : 'light';
@@ -420,13 +422,7 @@ window.onload = () => {
     document.body.classList.add(savedTheme === 'dark' ? 'dark-mode' : 'light-mode');
 };
 
-// Renderowanie początkowe
-renderProjects();
-renderActiveProject();
-renderKanbanBoard();  // Dodane wywołanie funkcji renderującej tablicę Kanban
-
-//Notification
-const sendNotification = (title: string, message: string, priority: 'low' | 'medium' | 'high') => {
+function sendNotification(title: string, message: string, priority: 'low' | 'medium' | 'high') {
     const notification: Notification = {
         title,
         message,
@@ -435,12 +431,10 @@ const sendNotification = (title: string, message: string, priority: 'low' | 'med
         read: false
     };
     notificationService.send(notification);
-};
+}
 
-// Mock użytkowników
 userService.mockUsers();
 
-// Emitowanie powiadomień przy dodawaniu projektu
 addProjectForm.addEventListener('submit', (event) => {
     event.preventDefault();
     const projectNameInput = document.getElementById('project-name') as HTMLInputElement;
@@ -456,7 +450,6 @@ addProjectForm.addEventListener('submit', (event) => {
     sendNotification('New Project Added', `Project "${projectName}" has been added.`, 'medium');
 });
 
-// Emitowanie powiadomień przy dodawaniu historyjki
 addStoryForm.addEventListener('submit', (event) => {
     event.preventDefault();
     const storyNameInput = document.getElementById('story-name') as HTMLInputElement;
@@ -478,7 +471,7 @@ addStoryForm.addEventListener('submit', (event) => {
         activeProject,
         new Date(),
         StoryState.Todo,
-        currentUser!
+        userService.getCurrentUser()!
     );
     storyService.createStory(newStory);
     renderStories();
@@ -489,7 +482,6 @@ addStoryForm.addEventListener('submit', (event) => {
     sendNotification('New Story Added', `Story "${storyName}" has been added to project "${activeProject.nazwa}".`, 'medium');
 });
 
-// Emitowanie powiadomień przy dodawaniu zadania
 addTaskForm.addEventListener('submit', (event) => {
     event.preventDefault();
     const taskNameInput = document.getElementById('task-name') as HTMLInputElement;
@@ -558,3 +550,6 @@ notificationService.list().subscribe((notifications: any[]) => {
     notificationService.markAsRead(index);
 };
 
+renderProjects();
+renderActiveProject();
+renderKanbanBoard();

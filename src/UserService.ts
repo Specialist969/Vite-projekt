@@ -19,55 +19,40 @@ export class UserService {
 
     mockUsers(): void {
         const users: User[] = [
-            new User(1, 'Pawel', 'Musial', UserRole.Admin),
-            new User(2, 'Marta', 'Szynka', UserRole.DevOps),
-            new User(3, 'Dagmara', 'Fasolka', UserRole.Developer)
+            new User(1,'PM','qwerty', 'Pawel', 'Musial', UserRole.Admin),
+            new User(2,'MM', 'qwerty', 'Marta', 'Szynka', UserRole.DevOps),
+            new User(3, 'DM', 'qwerty', 'Dagmara', 'Fasolka', UserRole.Developer)
         ];
         localStorage.setItem(this.usersKey, JSON.stringify(users));
         this.mockLogin(users[0]);
     }
 
     register(username: string, password: string, firstName: string, lastName: string, role: UserRole): void {
-        if (role !== UserRole.DevOps && role !== UserRole.Developer) {
-            alert('Invalid role selected');
+        const users = this.getUsers();
+        if (users.find(user => user.username === username)) {
+            alert('Username already exists');
             return;
         }
-        const users = this.getUsers();
-        const newUser = new User(Date.now(), firstName, lastName, role);
+        const newUser = new User(Date.now(), username, password, firstName, lastName, role);
         users.push(newUser);
         this.saveUsers(users);
         alert(`User ${username} registered successfully!`);
     }
 
-    login(username: string, password: string) {
-        fetch('http://localhost:3000/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, password })
-        }).then(res => res.json())
-            .then(({ token, refreshToken }) => {
-                localStorage.setItem('jwt', token);
-                localStorage.setItem('refreshToken', refreshToken);
-            })
-            .catch(error => console.error('Login error:', error));
+    login(username: string, password: string): boolean {
+        const users = this.getUsers();
+        const user = users.find(user => user.username === username && user.password === password);
+        if (user) {
+            localStorage.setItem(this.currentUserKey, JSON.stringify(user));
+            return true;
+        } else {
+            alert('Invalid username or password');
+            return false;
+        }
     }
 
-    refreshToken() {
-        const refreshToken = localStorage.getItem('refreshToken')!;
-        fetch('http://localhost:3000/refreshToken', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ refreshToken })
-        }).then(res => res.json())
-            .then(({ token, refreshToken: newRefreshToken }) => {
-                localStorage.setItem('jwt', token);
-                localStorage.setItem('refreshToken', newRefreshToken);
-            })
-            .catch(error => console.error('Token refresh error:', error));
+    logout(): void {
+        localStorage.removeItem(this.currentUserKey);
     }
 
     private saveUsers(users: User[]): void {
