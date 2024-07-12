@@ -1,6 +1,6 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 
-type ISOString = string;
+export type ISOString = string;
 
 export type Notification = {
     title: string;

@@ -8,12 +8,26 @@
 </head>
 <body>
     <button id="theme-toggle">Przełącz tryb</button>
+    <button id="theme-toggle">Toggle Theme</button>
+    <h2>Notifications</h2>
+    <span id="notification-count"></span>
+    <ul id="notification-list"></ul>
+    <form id="registration-form">
+        <input type="text" id="register-username" placeholder="Login" required>
+        <input type="password" id="register-password" placeholder="Password" required>
+        <input type="text" id="register-first-name" placeholder="First Name" required>
+        <input type="text" id="register-last-name" placeholder="Last Name" required>
+        <select id="register-role" required>
+            <option value="devops">DevOps</option>
+            <option value="developer">Developer</option>
+        </select>
+        <button type="submit">Register</button>
+    </form>
+    
     <form id="login-form">
         <input type="text" id="login-username" placeholder="Login" required>
         <input type="password" id="login-password" placeholder="Hasło" required>
         <button type="submit">Zaloguj</button>
-        <button id="notification-toggle">Powiadomienia (<span id="notification-count">0</span>)</button>
-        <ul id="notification-list"></ul>
     </form>
 
     <h1>Zarządzanie Projektem</h1>
@@ -51,11 +65,10 @@
             <option value="high">Wysoki</option>
         </select>
         <input type="number" id="task-estimated-time" placeholder="Przewidywany czas (w godzinach)" required>
-        <select id="story-select" required>
-            <!-- Options will be dynamically populated -->
-        </select>
+        <select id="story-select" required></select>
         <select id="user-select" required>
-            <!-- Options will be dynamically populated -->
+            <option value="devops">DevOps</option>
+            <option value="developer">Developer</option>
         </select>
         <button type="submit">Dodaj Zadanie</button>
     </form>
